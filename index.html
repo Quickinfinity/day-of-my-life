@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day of My Life</title>
+<meta name="description" content="See which day of your life you are on. Your birthday is day one. A King James verse for the day, saved on this device.">
+<meta name="theme-color" content="#0c141c">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,480&family=Outfit:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#0c141c;--surface:#15202c;--line:#243140;--fg:#eef3f8;--muted:#8ea0b3;
+  --accent:#5bc9d6;--accent-ink:#07141a;
+  --display:"Fraunces","Iowan Old Style",Palatino,Georgia,serif;
+  --sans:"Outfit","Avenir Next",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.5}
+p,h1,h2,blockquote{margin:0}
+button,input{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+
+.app{max-width:28rem;min-height:100dvh;margin:0 auto;padding:1.25rem 1.5rem 2rem;display:flex;flex-direction:column}
+.brand img{display:block;height:2.75rem;width:auto;max-width:100%;border-radius:.375rem;background:#fff;object-fit:contain;object-position:left}
+.brand p{margin-top:.375rem;font-family:var(--display);font-size:.75rem;color:var(--muted)}
+
+/* Menu */
+.menu{display:flex;gap:.25rem;margin-top:1rem;padding:.25rem;background:var(--surface);border:1px solid var(--line);border-radius:1rem;overflow-x:auto;scrollbar-width:none}
+.menu::-webkit-scrollbar{display:none}
+.menu button{flex:1 0 auto;height:2.5rem;padding:0 .4rem;border:0;border-radius:.75rem;background:transparent;color:var(--muted);font-size:.8125rem;font-weight:500;white-space:nowrap;cursor:pointer}
+.menu button:hover{color:var(--fg)}
+.menu button[aria-current="page"]{background:var(--bg);color:var(--fg)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.view{flex:1;display:flex;flex-direction:column;padding-top:1.5rem}
+.view.center{justify-content:center}
+
+.eyebrow{font-size:.75rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.eyebrow.accent{color:var(--accent)}
+.day{margin-top:.5rem;font-family:var(--display);font-size:clamp(4.25rem,22vw,7.5rem);line-height:.88;letter-spacing:-.045em;font-weight:500;font-variant-numeric:tabular-nums}
+.of{margin-top:.75rem;font-family:var(--display);font-size:1.25rem;font-style:italic}
+.rule{display:block;width:2.5rem;height:1px;margin-top:1.5rem;background:var(--accent)}
+.weekday{margin-top:1.5rem;font-family:var(--display);font-size:1.5rem}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.mt1{margin-top:.25rem}.mt4{margin-top:1rem}.mt6{margin-top:1.5rem}
+
+h1{font-family:var(--display);font-weight:500;font-size:2.25rem;line-height:1.15;text-wrap:balance}
+h2{font-family:var(--display);font-weight:500;font-size:1.75rem;line-height:1.2}
+.lede{margin-top:1rem;max-width:20rem;color:var(--muted);line-height:1.6;text-wrap:pretty}
+
+.card{border:1px solid var(--line);background:var(--surface);border-radius:1.5rem;padding:1rem}
+.card.verse{padding:1.5rem 1.25rem}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:.25rem;padding:.25rem;background:var(--bg);border-radius:1rem}
+.seg button{height:2.75rem;border:0;border-radius:.75rem;background:transparent;color:var(--muted);font-size:.875rem;font-weight:500;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg)}
+
+label{display:block;font-size:.875rem;font-weight:500}
+.field{display:block;width:100%;height:3.5rem;margin-top:.5rem;padding:0 1rem;border:1px solid var(--line);border-radius:1rem;background:var(--bg);font-size:1.125rem;outline:none}
+.field.on-bg{background:var(--surface)}
+.field:focus-visible{outline:none;border-color:var(--accent)}
+.field::placeholder{color:var(--muted)}
+.result{margin-top:1rem;min-height:3.5rem;font-family:var(--display);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.result span{display:block;margin-top:.25rem;font-family:var(--sans);font-size:1rem;color:var(--muted)}
+.result span.only{margin-top:0}
+.note{margin-top:.75rem;min-height:1.25rem;font-size:.875rem;color:var(--accent)}
+.primary{height:3.5rem;margin-top:2rem;border:0;border-radius:1rem;background:var(--accent);color:var(--accent-ink);font-weight:500;cursor:pointer}
+.primary:hover{opacity:.9}
+.ghost{height:2.75rem;margin-top:1rem;padding:0 1rem;border:1px solid var(--line);border-radius:1rem;background:transparent;font-size:.875rem;font-weight:500;cursor:pointer}
+.ghost:hover{border-color:var(--accent)}
+
+blockquote{margin-top:1rem;font-family:var(--display);font-size:1.125rem;line-height:1.375;text-wrap:pretty}
+blockquote.long{font-size:1rem}
+.skel span{display:block;height:1rem;border-radius:.25rem;background:var(--line);animation:pulse 2s ease-in-out infinite}
+.skel span+span{margin-top:.5rem}
+@keyframes pulse{50%{opacity:.5}}
+@media (prefers-reduced-motion:reduce){.skel span{animation:none}}
+
+.age-lead{font-family:var(--display);font-size:1.25rem;font-style:italic}
+.age-day{margin-top:.75rem;font-family:var(--display);font-size:1.875rem}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="brand">
+    <img src="tcp-logo.jpg" alt="The Concrete Protector" width="600" height="172">
+    <p>Day of My Life</p>
+  </header>
+
+  <nav class="menu" id="menu" aria-label="Day of My Life" hidden>
+    <button type="button" data-view="today">Today</button>
+    <button type="button" data-view="lookup">Look up</button>
+    <button type="button" data-view="age">Your age</button>
+    <button type="button" data-view="verse">Verse</button>
+    <button type="button" data-view="birthday">Birthday</button>
+  </nav>
+
+  <!-- First visit -->
+  <form class="view center" id="view-welcome" novalidate hidden>
+    <h1>When were you born?</h1>
+    <p class="lede">The day of your birth is day one. From there, every morning is another day of your life.</p>
+    <label for="welcome-birth" style="margin-top:2rem">Birthdate</label>
+    <input class="field on-bg" id="welcome-birth" type="date" min="1900-01-01" required>
+    <p class="note" id="welcome-note" role="status"></p>
+    <p class="small muted">Your birthdate stays on this device.</p>
+    <button class="primary" type="submit">Begin</button>
+  </form>
+
+  <!-- Today -->
+  <section class="view" id="view-today" hidden>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:.5rem 0 2rem">
+      <p class="eyebrow">Day</p>
+      <p class="day" id="today-day"></p>
+      <p class="of">of my life</p>
+      <span class="rule" aria-hidden="true"></span>
+      <p class="weekday" id="today-weekday"></p>
+      <p class="muted mt1" id="today-date"></p>
+      <p class="mt4" id="today-age"></p>
+      <p class="small muted mt1">Your birthday was day one.</p>
+    </div>
+    <div class="card verse" data-verse aria-live="polite"></div>
+  </section>
+
+  <!-- Look up a day -->
+  <section class="view" id="view-lookup" hidden>
+    <h2>Look up a day</h2>
+    <div class="card mt6">
+      <div class="seg" role="group" aria-label="Look up by">
+        <button type="button" data-mode="day" aria-pressed="true">Day number</button>
+        <button type="button" data-mode="date" aria-pressed="false">A date</button>
+      </div>
+      <div id="lookup-day" class="mt4">
+        <label for="life-day">Which day</label>
+        <input class="field" id="life-day" inputmode="numeric" autocomplete="off" value="17777">
+        <p class="result" id="life-day-result" role="status"></p>
+      </div>
+      <div id="lookup-date" class="mt4" hidden>
+        <label for="life-date">Which date</label>
+        <input class="field" id="life-date" type="date" max="9999-12-31">
+        <p class="result" id="life-date-result" role="status"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- When I was your age -->
+  <section class="view" id="view-age" hidden>
+    <h2>When I was your age</h2>
+    <div class="card mt6">
+      <label for="child-name">Name</label>
+      <input class="field" id="child-name" autocomplete="off" placeholder="Their name" maxlength="40">
+      <label for="child-birth" class="mt4">Birthday</label>
+      <input class="field" id="child-birth" type="date" min="1900-01-01">
+      <p class="note" id="child-note" role="status" hidden></p>
+      <div id="child-result" role="status" hidden></div>
+    </div>
+  </section>
+
+  <!-- Verse -->
+  <section class="view" id="view-verse" hidden>
+    <h2>Today&rsquo;s verse</h2>
+    <div class="card verse mt6" data-verse aria-live="polite"></div>
+  </section>
+
+  <!-- Birthday -->
+  <form class="view" id="view-birthday" novalidate hidden>
+    <h2>Your birthday</h2>
+    <p class="lede">Counted as day one. Change it and the day number updates at once.</p>
+    <label for="settings-birth" style="margin-top:2rem">Birthdate</label>
+    <input class="field on-bg" id="settings-birth" type="date" min="1900-01-01" required>
+    <p class="note" id="settings-note" role="status"></p>
+    <p class="small muted">Your birthdate stays on this device.</p>
+    <button class="primary" type="submit">Save birthdate</button>
+  </form>
+</div>
+
+<script>
+(function(){
+'use strict';
+var K_BIRTH='doml.birthdate',K_VERSE='doml.verse.v3',K_CHILD='doml.child';
+var $=function(id){return document.getElementById(id)};
+
+/* ---------- dates ---------- */
+function parseIso(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');if(!m)return null;
+  var y=+m[1],mo=+m[2],d=+m[3],dt=new Date(y,mo-1,d);
+  return(dt.getFullYear()!==y||dt.getMonth()!==mo-1||dt.getDate()!==d)?null:dt}
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function dayNumber(birthIso,when){var b=parseIso(birthIso),t=midnight(when||new Date());
+  return Math.round((Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())-Date.UTC(b.getFullYear(),b.getMonth(),b.getDate()))/864e5)+1}
+function dateOfDay(birthIso,n){var b=parseIso(birthIso);if(!b||!Number.isInteger(n)||n<1||n>150000)return null;
+  var d=new Date(b.getFullYear(),b.getMonth(),b.getDate());d.setDate(d.getDate()+(n-1));return d.getFullYear()>9999?null:d}
+function years(birthIso,when){var b=parseIso(birthIso),t=midnight(when||new Date()),y=t.getFullYear()-b.getFullYear();
+  if(t.getMonth()<b.getMonth()||(t.getMonth()===b.getMonth()&&t.getDate()<b.getDate()))y--;return y}
+function yearsLabel(y){return y<=0?'Less than a year':y===1?'1 year':y.toLocaleString('en-US')+' years'}
+function yearsOld(y){return y<=0?'not a year old yet':y===1?'1 year old':y.toLocaleString('en-US')+' years old'}
+function birthError(s){if(!s)return'Choose your birthdate.';var d=parseIso(s);
+  if(!d)return'That date isn’t valid.';if(d.getFullYear()<1900)return'Enter a year from 1900 on.';
+  if(d>midnight(new Date()))return'That day hasn’t happened yet.';return null}
+var fmtWeekday=new Intl.DateTimeFormat('en-US',{weekday:'long'});
+var fmtDate=new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric'});
+function num(n){return n.toLocaleString('en-US')}
+
+/* ---------- storage ---------- */
+function get(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function del(k){try{localStorage.removeItem(k)}catch(e){}}
+function loadBirth(){var b=get(K_BIRTH);return(!b||birthError(b))?null:b}
+function loadChild(){try{var c=JSON.parse(get(K_CHILD)||'null');
+  if(!c||typeof c.birth!=='string'||birthError(c.birth))return null;
+  return{name:typeof c.name==='string'?c.name.slice(0,40):'',birth:c.birth}}catch(e){return null}}
+
+/* ---------- verse (KJV only) ---------- */
+var VERSES='psalm+90:12.psalm+118:24.psalm+23:1-3.psalm+139:14.psalm+16:11.psalm+37:5.psalm+91:1-2.psalm+121:7-8.psalm+46:1.psalm+27:1.proverbs+3:5-6.proverbs+4:18.proverbs+16:3.ecclesiastes+3:1.isaiah+40:31.isaiah+41:10.lamentations+3:22-23.joshua+1:9.deuteronomy+31:8.micah+6:8.matthew+6:33-34.matthew+11:28.john+3:16.john+14:27.john+15:5.romans+8:28.romans+12:12.philippians+4:6-7.colossians+3:2.ephesians+2:8-9.2+corinthians+5:17.galatians+5:22-23.hebrews+12:1-2.hebrews+13:5.james+1:17.1+peter+5:7.psalm+34:8.numbers+6:24-26.isaiah+26:3.matthew+5:16.john+1:4-5.psalm+19:14'.split('.');
+function verseKey(d){var n=Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(d.getFullYear(),0,1))/864e5);
+  return VERSES[(n%VERSES.length+VERSES.length)%VERSES.length]}
+function cachedVerse(day){try{var v=JSON.parse(get(K_VERSE)||'null');
+  if(!v||v.date!==day||!v.text||!v.reference)return null;
+  var t=String(v.translation||'').toLowerCase();
+  return(t==='kjv'||t.indexOf('king james')>=0)?v:null}catch(e){return null}}
+function fetchVerse(){var now=new Date(),day=iso(now),hit=cachedVerse(day);
+  if(hit)return Promise.resolve(hit);
+  var ctl=new AbortController(),timer=setTimeout(function(){ctl.abort()},8000);
+  return fetch('https://bible-api.com/'+verseKey(now)+'?translation=kjv',{signal:ctl.signal})
+    .then(function(r){if(!r.ok)throw new Error('Verse request failed');return r.json()})
+    .then(function(j){var text=(j.text||'').replace(/\s+/g,' ').trim(),ref=(j.reference||'').trim(),
+        tid=(j.translation_id||'').trim().toLowerCase();
+      if(tid&&tid!=='kjv')throw new Error('Only the King James Version is used');
+      if(!text||!ref)throw new Error('Verse response was incomplete');
+      var v={date:day,reference:ref,text:text,translation:'KJV'};set(K_VERSE,JSON.stringify(v));return v})
+    .finally(function(){clearTimeout(timer)})}
+function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+function renderVerse(){
+  document.querySelectorAll('[data-verse]').forEach(function(box){
+    box.replaceChildren(el('p','eyebrow accent','Today’s verse'));
+    var sk=el('div','skel mt4');sk.setAttribute('aria-busy','true');
+    sk.append(el('span','sr-only','Loading today’s verse'),el('span'),el('span'));
+    sk.children[2].style.width='80%';box.append(sk)});
+  fetchVerse().then(function(v){
+    document.querySelectorAll('[data-verse]').forEach(function(box){
+      var p=el('p','small mt4',v.reference);p.style.marginTop='1.25rem';
+      var t=el('p','muted',v.translation);t.style.fontSize='.75rem';
+      box.replaceChildren(el('p','eyebrow accent','Today’s verse'),
+        el('blockquote',v.text.length>220?'long':'',v.text),p,t)})
+  }).catch(function(){
+    document.querySelectorAll('[data-verse]').forEach(function(box){
+      var b=el('button','ghost','Try again');b.type='button';b.onclick=renderVerse;
+      box.replaceChildren(el('p','eyebrow accent','Today’s verse'),el('p','mt4','The verse didn’t load.'),b)})})}
+
+/* ---------- views ---------- */
+var VIEWS=['today','lookup','age','verse','birthday'];
+var birth=null;
+function show(name){
+  if(!birth)name='welcome';else if(VIEWS.indexOf(name)<0)name='today';
+  $('menu').hidden=!birth;
+  ['welcome'].concat(VIEWS).forEach(function(v){$('view-'+v).hidden=v!==name});
+  document.querySelectorAll('#menu button').forEach(function(b){
+    if(b.dataset.view===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  if(name==='today')renderToday();
+  if(name==='lookup'){renderDay();renderDate()}
+  if(name==='age')renderAge();
+  if(name==='birthday'){$('settings-birth').value=birth;$('settings-note').textContent=''}
+  if(birth&&location.hash.slice(1)!==name)history.replaceState(null,'','#'+name);
+  window.scrollTo(0,0)}
+
+function renderToday(){var now=new Date();
+  $('today-day').textContent=num(dayNumber(birth,now));
+  $('today-weekday').textContent=fmtWeekday.format(now);
+  $('today-date').textContent=fmtDate.format(now);
+  $('today-age').textContent=yearsLabel(years(birth,now))}
+
+function result(box,main,sub){box.replaceChildren();
+  if(main){box.append(main);if(sub)box.append(el('span','',sub))}
+  else box.append(el('span','only',sub))}
+function renderDay(){var raw=$('life-day').value.replace(/\D/g,''),n=raw?Number(raw):null,d=n&&n>=1?dateOfDay(birth,n):null;
+  if(d)result($('life-day-result'),fmtWeekday.format(d),fmtDate.format(d));
+  else result($('life-day-result'),null,n!==null&&n>=1?'That day is too far out.':n!==null&&n<1?'Day one is your birthday.':'Enter a day number.')}
+function renderDate(){var v=$('life-date').value,d=v?parseIso(v):null,n=d?dayNumber(birth,d):null,today=iso(new Date()),msg='';
+  $('life-date').min=birth;
+  if(n!==null&&n<1)msg='That was before day one.';
+  else if(n&&v===today)msg='That’s today.';
+  else if(n&&v>today)msg='Still ahead.';
+  else if(n)msg='That day has passed.';
+  if(n!==null&&n>=1)result($('life-date-result'),'Day '+num(n),msg);
+  else result($('life-date-result'),null,msg||'Choose a date.')}
+
+function ageLines(childBirth,name){var now=new Date(),c=dayNumber(childBirth,now),m=dayNumber(birth,now);
+  if(c<1)return null;
+  var older=c>m; /* true when the other person has lived more days than me */
+  var was=dateOfDay(older?childBirth:birth,older?m:c),will=dateOfDay(older?birth:childBirth,older?c:m);
+  if(!was)return null;
+  var lead=name?name+', when':'When',theirs=yearsOld(years(childBirth,now));
+  return{wasLead:older?lead+' you were my age, it was':lead+' I was your age, it was',
+    wasDay:fmtWeekday.format(was),wasDate:fmtDate.format(was),
+    wasNote:older?'You are '+theirs+'. I am still on day '+num(m)+'.':'You are '+theirs+'. That was day '+num(c)+' for me.',
+    willLead:will?(older?'When I am your age, it will be':'When you are my age, it will be'):null,
+    willDay:will?fmtWeekday.format(will):'',willDate:will?fmtDate.format(will):'',
+    willNote:will?(older?'Day '+num(c)+' of my life.':'Day '+num(m)+' of your life.'):''}}
+function renderAge(){var name=$('child-name').value.trim(),b=$('child-birth').value,box=$('child-result'),note=$('child-note');
+  $('child-birth').max=iso(new Date());
+  var err=b?birthError(b):null;note.hidden=!err;note.textContent=err||'';
+  var L=!err&&b?ageLines(b,name):null;box.hidden=!L;box.replaceChildren();
+  if(!L)return;
+  var a=el('p','age-lead',L.wasLead);a.style.marginTop='1.5rem';
+  box.append(a,el('p','age-day',L.wasDay),el('p','muted mt1',L.wasDate),el('p','small muted',L.wasNote));
+  box.lastChild.style.marginTop='.5rem';
+  if(L.willLead){var r=el('span','rule');r.setAttribute('aria-hidden','true');
+    var w=el('p','age-lead',L.willLead);w.style.marginTop='1.5rem';
+    box.append(r,w,el('p','age-day',L.willDay),el('p','muted mt1',L.willDate),el('p','small muted',L.willNote));
+    box.lastChild.style.marginTop='.5rem'}}
+function saveChild(){var b=$('child-birth').value;
+  if(!b){del(K_CHILD);return}
+  if(!birthError(b))set(K_CHILD,JSON.stringify({name:$('child-name').value.trim().slice(0,40),birth:b}))}
+
+/* ---------- wiring ---------- */
+function birthForm(formId,inputId,noteId){
+  $(inputId).max=iso(new Date());
+  $(inputId).addEventListener('input',function(){$(noteId).textContent=''});
+  $(formId).addEventListener('submit',function(e){e.preventDefault();
+    var v=$(inputId).value,err=birthError(v);
+    if(err){$(noteId).textContent=err;return}
+    set(K_BIRTH,v);birth=v;show('today')})}
+birthForm('view-welcome','welcome-birth','welcome-note');
+birthForm('view-birthday','settings-birth','settings-note');
+
+$('menu').addEventListener('click',function(e){var b=e.target.closest('button[data-view]');if(b)show(b.dataset.view)});
+document.querySelectorAll('.seg button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.seg button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+  $('lookup-day').hidden=b.dataset.mode!=='day';$('lookup-date').hidden=b.dataset.mode!=='date'})});
+$('life-day').addEventListener('input',function(){this.value=this.value.replace(/[^\d,]/g,'').slice(0,7);renderDay()});
+$('life-date').addEventListener('input',renderDate);
+$('child-name').addEventListener('input',function(){saveChild();renderAge()});
+$('child-birth').addEventListener('input',function(){saveChild();renderAge()});
+window.addEventListener('hashchange',function(){show(location.hash.slice(1))});
+
+birth=loadBirth();
+var child=loadChild();
+if(child){$('child-name').value=child.name;$('child-birth').value=child.birth}
+show(location.hash.slice(1)||'today');
+renderVerse();
+})();
+</script>
+</body>
+</html>
