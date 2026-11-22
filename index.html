@@ -27,7 +27,7 @@ button,input{font:inherit;color:inherit}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 
 .app{max-width:28rem;min-height:100dvh;margin:0 auto;padding:1.25rem 1.5rem 2rem;display:flex;flex-direction:column}
-.brand img{display:block;height:2.75rem;width:auto;max-width:100%;border-radius:.375rem;background:#fff;object-fit:contain;object-position:left}
+.brand img{display:block;height:2.75rem;width:auto;max-width:100%;padding:.3rem .5rem;border-radius:.375rem;background:#fff;object-fit:contain;object-position:left}
 .brand p{margin-top:.375rem;font-family:var(--display);font-size:.75rem;color:var(--muted)}
 
 /* Menu */
@@ -89,7 +89,7 @@ blockquote.long{font-size:1rem}
 <body>
 <div class="app">
   <header class="brand">
-    <img src="tcp-logo.jpg" alt="The Concrete Protector" width="600" height="172">
+    <img src="ibrainos-logo.png" alt="IBrainOS" width="480" height="183">
     <p>Day of My Life</p>
   </header>
 
@@ -222,7 +222,7 @@ function verseKey(d){var n=Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.g
 function cachedVerse(day){try{var v=JSON.parse(get(K_VERSE)||'null');
   if(!v||v.date!==day||!v.text||!v.reference)return null;
   var t=String(v.translation||'').toLowerCase();
-  return(t==='kjv'||t.indexOf('king james')>=0)?v:null}catch(e){return null}}
+  return(t==='kjv'||t.indexOf('king james')>=0)?{date:v.date,reference:v.reference,text:v.text,translation:'KJV'}:null}catch(e){return null}}
 function fetchVerse(){var now=new Date(),day=iso(now),hit=cachedVerse(day);
   if(hit)return Promise.resolve(hit);
   var ctl=new AbortController(),timer=setTimeout(function(){ctl.abort()},8000);
@@ -336,6 +336,17 @@ $('life-date').addEventListener('input',renderDate);
 $('child-name').addEventListener('input',function(){saveChild();renderAge()});
 $('child-birth').addEventListener('input',function(){saveChild();renderAge()});
 window.addEventListener('hashchange',function(){show(location.hash.slice(1))});
+
+/* a page left open past midnight: refresh the day, the date limits and the verse */
+var shownDay=iso(new Date());
+function rollover(){var d=iso(new Date());if(d===shownDay)return;shownDay=d;
+  $('welcome-birth').max=d;$('settings-birth').max=d;
+  var cur=document.querySelector('#menu button[aria-current]');
+  if(cur&&cur.dataset.view!=='birthday')show(cur.dataset.view);
+  renderVerse()}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)rollover()});
+window.addEventListener('focus',rollover);
+setInterval(rollover,60000);
 
 birth=loadBirth();
 var child=loadChild();
