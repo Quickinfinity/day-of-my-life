@@ -262,8 +262,9 @@ function show(name){
   document.querySelectorAll('#menu button').forEach(function(b){
     if(b.dataset.view===name)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
   if(name==='today')renderToday();
-  if(name==='lookup'){renderDay();renderDate()}
-  if(name==='age')renderAge();
+  /* set min/max here, not on each keystroke: changing them mid-entry clears a half-typed date */
+  if(name==='lookup'){$('life-date').min=birth;renderDay();renderDate()}
+  if(name==='age'){$('child-birth').max=iso(new Date());renderAge()}
   if(name==='birthday'){$('settings-birth').value=birth;$('settings-note').textContent=''}
   if(birth&&location.hash.slice(1)!==name)history.replaceState(null,'','#'+name);
   window.scrollTo(0,0)}
@@ -281,7 +282,6 @@ function renderDay(){var raw=$('life-day').value.replace(/\D/g,''),n=raw?Number(
   if(d)result($('life-day-result'),fmtWeekday.format(d),fmtDate.format(d));
   else result($('life-day-result'),null,n!==null&&n>=1?'That day is too far out.':n!==null&&n<1?'Day one is your birthday.':'Enter a day number.')}
 function renderDate(){var v=$('life-date').value,d=v?parseIso(v):null,n=d?dayNumber(birth,d):null,today=iso(new Date()),msg='';
-  $('life-date').min=birth;
   if(n!==null&&n<1)msg='That was before day one.';
   else if(n&&v===today)msg='That’s today.';
   else if(n&&v>today)msg='Still ahead.';
@@ -302,7 +302,6 @@ function ageLines(childBirth,name){var now=new Date(),c=dayNumber(childBirth,now
     willDay:will?fmtWeekday.format(will):'',willDate:will?fmtDate.format(will):'',
     willNote:will?(older?'Day '+num(c)+' of my life.':'Day '+num(m)+' of your life.'):''}}
 function renderAge(){var name=$('child-name').value.trim(),b=$('child-birth').value,box=$('child-result'),note=$('child-note');
-  $('child-birth').max=iso(new Date());
   var err=b?birthError(b):null;note.hidden=!err;note.textContent=err||'';
   var L=!err&&b?ageLines(b,name):null;box.hidden=!L;box.replaceChildren();
   if(!L)return;
